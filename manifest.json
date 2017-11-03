@@ -1,0 +1,7 @@
+{
+  "name": "ticket-sales",
+  "short_name": "ticket-sales",
+  "description": "CIS 371 Semester Project",
+  "start_url": "/",
+  "display": "standalone"
+}
