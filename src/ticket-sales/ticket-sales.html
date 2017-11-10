@@ -1,35 +1,65 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="/bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 
 <dom-module id="ticket-sales">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2>Hello world [[prop1]]!!</h2>
+    <template>
 
+        <firebase-app
+                auth-domain="ticket-sales-41085.firebaseapp.com"
+                database-url="https://ticket-sales-41085.firebaseio.com/"
+                api-key="AIzaSyC_QssasYUo1XpRF7b6m6ieR5CfS9D85WY"
+                storage-bucket="ticket-sales-41085.appspot.com"
+                messaging-sender-id="767743966491">
+        </firebase-app>
+        <firebase-query path="/movies" data="{{qryData}}"></firebase-query>
 
-  </template>
+        <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError"></firebase-auth>
 
-  <script>
-      /**
-       * @customElement
-       * @polymer
-       */
-      class TicketSales extends Polymer.Element {
-          static get is() { return 'ticket-sales'; }
-          static get properties() {
-              return {
-                  prop1: {
-                      type: String,
-                      value: 'ticket-sales'
-                  }
-              };
-          }
-      }
+        <style>
+            :host {
+                display: block;
+            }
+            app-toolbar {
+                background-color: #00796b;
+                color: #fff;
+                margin: 20px 0;
+                font-family: 'Roboto', 'Noto', sans-serif;
+            }
+        </style>
 
-      window.customElements.define(TicketSales.is, TicketSales);
-  </script>
+        <app-toolbar>
+            <div main-title>Browse Movies</div>
+        </app-toolbar>
+        <paper-button on-click="login">Login</paper-button>
+        <movie-list></movie-list>
+
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class TicketSales extends Polymer.Element {
+            static get is() { return 'ticket-sales'; }
+            static get properties() {
+                return {
+                    prop1: {
+                        type: String,
+                        value: 'ticket-sales'
+                    }
+                };
+            }
+
+            login() {
+                this.$.auth.signInWithPopup();
+            }
+        }
+
+        window.customElements.define(TicketSales.is, TicketSales);
+    </script>
 </dom-module>
