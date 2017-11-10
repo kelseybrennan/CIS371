@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 
+
 <dom-module id="ticket-sales">
   <template>
     <style>
@@ -7,26 +8,28 @@
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <h2>Hello world [[prop1]]!!</h2>
+
+
   </template>
 
   <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class TicketSales extends Polymer.Element {
-      static get is() { return 'ticket-sales'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'ticket-sales'
+      /**
+       * @customElement
+       * @polymer
+       */
+      class TicketSales extends Polymer.Element {
+          static get is() { return 'ticket-sales'; }
+          static get properties() {
+              return {
+                  prop1: {
+                      type: String,
+                      value: 'ticket-sales'
+                  }
+              };
           }
-        };
       }
-    }
 
-    window.customElements.define(TicketSales.is, TicketSales);
+      window.customElements.define(TicketSales.is, TicketSales);
   </script>
 </dom-module>

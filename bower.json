@@ -3,7 +3,10 @@
   "description": "CIS 371 Semester Project",
   "main": "index.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "polymerfire": "firebase/polymerfire#^2.2.1",
+    "iron-list": "PolymerElements/iron-list#^2.0.11",
+    "paper-card": "PolymerElements/paper-card#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
