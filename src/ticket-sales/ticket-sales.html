@@ -1,14 +1,22 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
-<link rel="import" href="/bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/app-layout/app-header">
+<link rel="import" href="../redux-mixin.html">
 
 <dom-module id="ticket-sales">
     <template>
 
         <firebase-app
+                id="firebaseApp"
                 auth-domain="ticket-sales-41085.firebaseapp.com"
                 database-url="https://ticket-sales-41085.firebaseio.com/"
                 api-key="AIzaSyC_QssasYUo1XpRF7b6m6ieR5CfS9D85WY"
@@ -28,14 +36,48 @@
                 color: #fff;
                 margin: 20px 0;
                 font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 18px;
+            }
+            app-header {
+                background-color: #00796b;
+            }
+            #userInfo {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 16px;
+            }
+            paper-tab {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 18px;
+                color: #cce4e1;
+            }
+            paper-tabs {
+                --paper-tabs-selection-bar-color: #cce4e1;
             }
         </style>
 
-        <app-toolbar>
-            <div main-title>Browse Movies</div>
-        </app-toolbar>
-        <paper-button on-click="login">Login</paper-button>
-        <movie-list></movie-list>
+        <app-header>
+            <app-toolbar>
+                <div main-title>Movie Tickets</div>
+                <div id="userInfo">
+                    Not logged in
+                    <paper-icon-button icon="perm-identity" on-click="login"></paper-icon-button>
+                </div>
+            </app-toolbar>
+
+            <paper-tabs selected="{{sel}}" sticky>
+                <paper-tab>Browse Movies</paper-tab>
+                <paper-tab>My Tickets</paper-tab>
+            </paper-tabs>
+        </app-header>
+
+        <iron-pages selected="{{sel}}">
+            <div>
+                <movie-list></movie-list>
+            </div>
+            <div>
+                <purchased-tickets></purchased-tickets>
+            </div>
+        </iron-pages>
 
     </template>
 
@@ -44,19 +86,39 @@
          * @customElement
          * @polymer
          */
-        class TicketSales extends Polymer.Element {
+        class TicketSales extends ReduxMixin(Polymer.Element) {
             static get is() { return 'ticket-sales'; }
             static get properties() {
                 return {
-                    prop1: {
+                    email: {
                         type: String,
-                        value: 'ticket-sales'
+                    },
+                    sel: {
+                        type: Number,
+                        value: 0
                     }
                 };
             }
 
+            constructor() {
+                super();
+                //this.$.email = "blank email";
+            }
+
             login() {
-                this.$.auth.signInWithPopup();
+                this.$.auth.signInWithPopup()
+                    .then((response) => {
+                        // After user is logged in, set the UID in the state
+                        var user = response.user;
+                        this.dispatch({type: 'SET_USER', payload: {uid: user.uid}});
+                        var dbRef = this.$.firebaseApp.app.database();
+                    })
+                    .catch((error) => console.log("Error logging in."));
+            }
+
+            _computeHidden() {
+                return false;
+                //if ()
             }
         }
 

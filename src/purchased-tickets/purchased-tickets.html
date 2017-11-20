@@ -7,21 +7,21 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 
-<dom-module id="movie-list">
+<dom-module id="purchased-tickets">
 
     <template>
 
-        <firebase-query path="/movies" data="{{qryData}}"></firebase-query>
-
-        <iron-list items="[[qryData]]" as="movie">
+        <div id="notLoggedIn">
+            You must be log in to view the tickets you have purchased.
+        </div>
+        <div id="myTickets">
+        <iron-list items="[[qryData]]" as="user">
             <template>
                 <div id="cardDiv" class="flex">
                     <paper-card>
                         <div class="card-header">
-                            [[movie.title]]
                         </div>
                         <div class="card-content">
-                            Movie info
                         </div>
                         <div class="card-actions">
                             <div class="layout horizontal end-justified">
@@ -35,10 +35,11 @@
                 </div>
             </template>
         </iron-list>
+        </div>
 
         <style include="iron-flex iron-flex-alignment">
 
-        <style>
+            <style>
             paper-card {
                 width: 100%;
             }
@@ -65,31 +66,22 @@
     </template>
 
     <script>
-        class MovieList extends Polymer.Element {
+        class PurchasedTickets extends Polymer.Element {
             static get is() {
-                return 'movie-list';
+                return 'purchased-tickets';
             }
             static get properties() {
                 return {
-                    prop1: {
+                    uid: {
                         type: String,
-                        value: 'movie-list'
+                        statePath: 'uid'
                     }
                 };
             }
-            viewDetail(ev) {
-                var key = ev.model.movie.$key;
-                console.log(key);
-            }
-
 
         }
 
-        /*this.$.auth.signInWithPopup()
-            .then(function(response) {})
-            .catch(function(error) {});
-*/
-        window.customElements.define(MovieList.is, MovieList);
+        window.customElements.define(PurchasedTickets.is, PurchasedTickets);
 
     </script>
 </dom-module>
