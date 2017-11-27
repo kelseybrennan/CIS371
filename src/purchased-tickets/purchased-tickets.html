@@ -6,49 +6,43 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../redux-mixin.html">
 
 <dom-module id="purchased-tickets">
 
     <template>
 
+        <firebase-query path="{{userPath}}" data="{{qryData}}"></firebase-query>
+
         <div id="notLoggedIn">
-            You must be log in to view the tickets you have purchased.
+            You must be logged in to view the tickets you have purchased.
         </div>
         <div id="myTickets">
-        <iron-list items="[[qryData]]" as="user">
-            <template>
-                <div id="cardDiv" class="flex">
-                    <paper-card>
-                        <div class="card-header">
-                        </div>
-                        <div class="card-content">
-                        </div>
-                        <div class="card-actions">
-                            <div class="layout horizontal end-justified">
-                                <div class="info">
-                                    <paper-icon-button icon="info-outline" on-click="viewDetail"></paper-icon-button>View info
-                                </div>
+            <iron-list items="[[qryData]]" as="ticket">
+                <template>
+                    <div>
+                        <paper-card>
+                            <div class="card-header">
+                                [[ticket.title]]
                             </div>
-                        </div>
-                    </paper-card>
-
-                </div>
-            </template>
-        </iron-list>
+                            <div class="card-content">
+                                [[ticket.numTickets]] ticket(s)
+                            </div>
+                        </paper-card>
+                    </div>
+                </template>
+            </iron-list>
         </div>
 
-        <style include="iron-flex iron-flex-alignment">
+        <style include="iron-flex iron-flex-alignment"></style>
 
-            <style>
+        <style>
             paper-card {
                 width: 100%;
             }
-            #cardDiv {
-                padding: 5px;
-            }
             iron-list {
                 width: 60vw;
-                height: 100vh;
+                height: 95vh;
             }
             .card-content {
                 font-family: 'Roboto', 'Noto', sans-serif;
@@ -58,15 +52,16 @@
                 font-size: 2em;
                 padding: 8px;
             }
-            .info {
+            #notLoggedIn {
                 font-family: 'Roboto', 'Noto', sans-serif;
+                padding: 10px;
             }
         </style>
 
     </template>
 
     <script>
-        class PurchasedTickets extends Polymer.Element {
+        class PurchasedTickets extends ReduxMixin(Polymer.Element) {
             static get is() {
                 return 'purchased-tickets';
             }
@@ -74,14 +69,25 @@
                 return {
                     uid: {
                         type: String,
+                        value: null,
                         statePath: 'uid'
+                    },
+                    userPath: {
+                        type: String,
+                        computed: '_computePath(uid)'
                     }
                 };
+            }
+
+            _computePath(uid) {
+                if (uid) {
+                    this.$.notLoggedIn.hidden = true;
+                }
+                return `/users/${uid}`;
             }
 
         }
 
         window.customElements.define(PurchasedTickets.is, PurchasedTickets);
-
     </script>
 </dom-module>

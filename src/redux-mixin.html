@@ -1,5 +1,5 @@
-<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
-<script src="../../node_modules/redux/dist/redux.js"></script>
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<script src="../node_modules/redux/dist/redux.js"></script>
 
 <script>
     const initialState = {};
@@ -9,9 +9,9 @@
                 console.log(action.payload.uid);
                 return Object.assign({},
                     state,
-                    {uid: action.payload.uid});
+                    {uid: action.payload.uid, email: action.payload.email});
             case 'LOGOUT_USER':
-                return Object.assign({}, state, {uid: null});
+                return Object.assign({}, state, {uid: null, email: null});
             default:
                 return state;
         }
