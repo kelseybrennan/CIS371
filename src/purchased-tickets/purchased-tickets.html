@@ -79,9 +79,15 @@
                 };
             }
 
+            /**
+             * Compute the path for Firebase and show/hide the message that
+             * you must be logged in to view tickets.
+             */
             _computePath(uid) {
                 if (uid) {
                     this.$.notLoggedIn.hidden = true;
+                } else {
+                    this.$.notLoggedIn.hidden = false;
                 }
                 return `/users/${uid}`;
             }

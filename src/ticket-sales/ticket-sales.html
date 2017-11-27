@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/app-layout/app-header">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../movie-list/movie-list.html">
 <link rel="import" href="../purchased-tickets/purchased-tickets.html">
 <link rel="import" href="../redux-mixin.html">
@@ -55,6 +56,10 @@
             paper-tabs {
                 --paper-tabs-selection-bar-color: #cce4e1;
             }
+            #dialogText {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 16px;
+            }
         </style>
 
         <app-header>
@@ -62,7 +67,7 @@
                 <div main-title>Movie Tickets</div>
                 <div id="userInfo">
                     {{email}}
-                    <paper-icon-button icon="perm-identity" on-click="login"></paper-icon-button>
+                    <paper-icon-button icon="perm-identity" on-click="toggleLogin"></paper-icon-button>
                 </div>
             </app-toolbar>
 
@@ -81,6 +86,16 @@
             </div>
         </iron-pages>
 
+        <paper-dialog id="logout" modal on-iron-overlay-closed="diaClosed">
+            <div id="dialogText">
+                Log out?
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>Logout</paper-button>
+            </div>
+        </paper-dialog>
+
     </template>
 
     <script>
@@ -94,6 +109,7 @@
                 return {
                     email: {
                         type: String,
+                        value: null,
                         statePath: 'email'
                     },
                     sel: {
@@ -103,25 +119,33 @@
                 };
             }
 
-            constructor() {
-                super();
-                //this.$.email = "blank email";
+            toggleLogin() {
+                if (this.email) { // Prompt for logout
+                    this.$.logout.open();
+                } else {    // Login
+                    this.$.auth.signInWithPopup()
+                        .then((response) => {
+                            // After user is logged in, set the UID & email in the state
+                            var user = response.user;
+                            this.dispatch({type: 'SET_USER', payload: {uid: user.uid, email: user.email}});
+                        })
+                        .catch((error) => console.log("Error logging in: " + error.message));
+                }
             }
 
-            login() {
-                this.$.auth.signInWithPopup()
-                    .then((response) => {
-                        // After user is logged in, set the UID in the state
-                        var user = response.user;
-                        this.dispatch({type: 'SET_USER', payload: {uid: user.uid, email: user.email}});
-                    })
-                    .catch((error) => console.log("Error logging in: "+ error.message));
+            /**
+             * Log the user out if they said OK.
+             */
+            diaClosed() {
+                if (this.$.logout.closingReason.confirmed) {
+                    this.$.auth.signOut()
+                        .then(response => {
+                            this.dispatch({type: 'LOGOUT_USER'});
+                        })
+                        .catch(error => console.log("Error logging out: " + error.message));
+                }
             }
 
-            _computeHidden() {
-                return false;
-                //if ()
-            }
         }
 
         window.customElements.define(TicketSales.is, TicketSales);
