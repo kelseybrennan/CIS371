@@ -1,0 +1,47 @@
+<body>
+Processing
+</body>
+<script src="https://www.gstatic.com/firebasejs/4.7.0/firebase.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyC_QssasYUo1XpRF7b6m6ieR5CfS9D85WY",
+        authDomain: "ticket-sales-41085.firebaseapp.com",
+        databaseURL: "https://ticket-sales-41085.firebaseio.com",
+        projectId: "ticket-sales-41085",
+        storageBucket: "ticket-sales-41085.appspot.com",
+        messagingSenderId: "767743966491"
+    };
+    firebase.initializeApp(config);
+</script>
+
+<script>
+
+    var request = new XMLHttpRequest();
+    request.open("GET", "https://api.themoviedb.org/3/discover/movie?page=1&include_video=false&include_adult=false&sort_by=popularity.desc&language=en-US&api_key=43ed0be6a31e46fd709064fec3a4c2ca");
+    request.send(null);
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            var my_JSON_object = JSON.parse(request.responseText);
+
+            for (var i = 0; i < my_JSON_object.results.length; i++) {
+                var movie = my_JSON_object.results[i];
+                console.log(movie.title);
+                console.log(movie.release_date);
+                console.log(movie.overview);
+
+                var poster_path = 'https://image.tmdb.org/t/p/w500/' + movie.poster_path;
+
+                var showtimes = ['10:30 AM', '12:15 PM', '3:00 PM', '5:45 PM', '7:30 PM', '9:00 PM'];
+
+                var db = firebase.database().ref().child('movies');
+                db.push({title: movie.title,
+                    release_date: movie.release_date,
+                    description: movie.overview,
+                    image: poster_path,
+                    showtimes: showtimes});
+            }
+        }
+    }
+
+</script>

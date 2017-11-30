@@ -21,7 +21,7 @@
                             [[movie.title]]
                         </div>
                         <div class="card-content">
-                            Movie info
+                            <img src="[[movie.image]]" height="25%" width="25%">
                         </div>
                         <div class="card-actions">
                             <div class="layout horizontal end-justified">
@@ -36,7 +36,7 @@
             </template>
         </iron-list>
 
-        <style include="iron-flex iron-flex-alignment">
+        <style include="iron-flex iron-flex-alignment"></style>
 
         <style>
             paper-card {
@@ -46,8 +46,8 @@
                 padding: 5px;
             }
             iron-list {
-                width: 60vw;
-                height: 95vh;
+                width: 90vw;
+                margin: auto;
             }
             .card-content {
                 font-family: 'Roboto', 'Noto', sans-serif;
