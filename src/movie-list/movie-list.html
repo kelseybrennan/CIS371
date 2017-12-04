@@ -36,17 +36,22 @@
             </template>
         </iron-list>
 
+        <div>
+            [[descriptionToShow]]
+        </div>
+
         <style include="iron-flex iron-flex-alignment"></style>
 
         <style>
             paper-card {
                 width: 100%;
+                height: 100%;
             }
             #cardDiv {
                 padding: 5px;
             }
             iron-list {
-                width: 90vw;
+                width: 95vw;
                 margin: auto;
             }
             .card-content {
@@ -71,15 +76,27 @@
             }
             static get properties() {
                 return {
-                    prop1: {
+                    qryData: {
+                        type: Array
+                    },
+                    descriptionToShow: {
                         type: String,
-                        value: 'movie-list'
+                        value: null
                     }
                 };
             }
+            
             viewDetail(ev) {
                 var key = ev.model.movie.$key;
                 console.log(key);
+                console.log(this.qryData);
+                this.qryData.forEach((movie) => {
+                   if (movie.$key === key) {
+                       console.log(movie.description);
+                       this.descriptionToShow = movie.description;
+                   }
+                });
+
             }
 
 
