@@ -6,6 +6,8 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../redux-mixin.html">
 
 <dom-module id="purchased-tickets">
@@ -29,11 +31,24 @@
                                 [[ticket.numTickets]] ticket(s)
                                 [[tickets.showtime]]
                             </div>
+                            <div class="card-actions">
+                                <paper-icon-button icon="close" on-click="returnTicket"></paper-icon-button>Cancel Ticket & Get Refund
+                            </div>
                         </paper-card>
                     </div>
                 </template>
             </iron-list>
         </div>
+
+        <paper-dialog id="confirmRefund" modal on-iron-overlay-closed="diaClosed">
+            <div id="dialogText">
+                Are you sure you want to return this ticket for a refund?
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
 
         <style include="iron-flex iron-flex-alignment"></style>
 
@@ -61,6 +76,20 @@
 
     </template>
 
+
+    <script src="https://www.gstatic.com/firebasejs/4.7.0/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyC_QssasYUo1XpRF7b6m6ieR5CfS9D85WY",
+            authDomain: "ticket-sales-41085.firebaseapp.com",
+            databaseURL: "https://ticket-sales-41085.firebaseio.com",
+            projectId: "ticket-sales-41085",
+            storageBucket: "ticket-sales-41085.appspot.com",
+            messagingSenderId: "767743966491"
+        };
+        firebase.initializeApp(config);
+    </script>
     <script>
         class PurchasedTickets extends ReduxMixin(Polymer.Element) {
             static get is() {
@@ -76,6 +105,10 @@
                     userPath: {
                         type: String,
                         computed: '_computePath(uid)'
+                    },
+                    selectedTicketKey: {
+                        type: String,
+                        value: null
                     }
                 };
             }
@@ -91,6 +124,25 @@
                     this.$.notLoggedIn.hidden = false;
                 }
                 return `/users/${uid}`;
+            }
+
+            /**
+             * Confirm that the user wants to return this ticket.
+             */
+            returnTicket(ev) {
+                this.selectedTicketKey = ev.model.ticket.$key;
+                this.$.confirmRefund.open();
+            }
+
+            /**
+             * If they pressed OK, remove the ticket from the user's data in Firebase
+             */
+            diaClosed() {
+                if (this.$.confirmRefund.closingReason.confirmed) {
+                    var dbRef = firebase.database();
+                    dbRef.ref(`users/${this.uid}/${this.selectedTicketKey}`).set(null);
+                    this.selectedTicketKey = null;
+                }
             }
 
         }
