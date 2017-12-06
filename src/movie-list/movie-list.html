@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<!--link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
@@ -104,5 +104,143 @@
 
         window.customElements.define(MovieList.is, MovieList);
 
+    </script>
+</dom-module-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="movie-list">
+
+    <template>
+
+        <firebase-query path="/movies" data="{{qryData}}"></firebase-query>
+
+        <iron-list items="[[qryData]]" as="movie">
+            <template>
+                <div id="cardDiv" class="flex">
+                    <paper-card>
+                        <div class="card-header">
+                            [[movie.title]]
+                        </div>
+                        <div class="card-content">
+                            <div class="horizontal left-justified">
+                                <img src="[[movie.image]]" height="25%" width="25%">
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="horizontal right-justified">
+                                [[movie.description]]
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            Release date: [[movie.release_date]]
+                        </div>
+                        <div class="card-content">
+                            <div class="horizontal justified">
+                                <div class="time">
+                                    <paper-icon-button icon="icons:event"></paper-icon-button>
+                                    [[movie.showtimes]]
+                                </div>
+                            </div>
+                        </div>
+                        <!--div class="card-actions">
+                            <div class="layout horizontal end-justified">
+                                <div class="info">
+                                    <paper-icon-button icon="menu"></paper-icon-button>View info
+                                </div>
+                            </div>
+                        </div-->
+
+                    </paper-card>
+
+                </div>
+            </template>
+        </iron-list>
+
+        <!--div>
+            [[descriptionToShow]]
+        </div-->
+
+        <style include="iron-flex iron-flex-alignment"></style>
+
+        <style>
+            paper-card {
+                width: 100%;
+                height: 100%;
+            }
+            #cardDiv {
+                padding: 5px;
+            }
+            iron-list {
+                width: 95vw;
+                margin: auto;
+            }
+            .card-content {
+                font-family: 'Roboto', 'Noto', sans-serif;
+            }
+            .card-header {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 4em;
+                padding: 8px;
+            }
+            .info {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                background-color: grey;
+                font-size: 2em;
+            }
+
+            .time {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                padding: 4px;
+                border-color: darkslategrey;
+                font-size: 2em;
+            }
+        </style>
+
+    </template>
+
+    <script>
+        class MovieList extends Polymer.Element {
+            static get is() {
+                return 'movie-list';
+            }
+            static get properties() {
+                return {
+                    qryData: {
+                        type: Array
+                    }/*,
+                    descriptionToShow: {
+                        type: String,
+                        value: null
+                    }*/
+                };
+            }
+
+            /*viewDetail(ev) {
+                var key = ev.model.movie.$key;
+                console.log(key);
+                console.log(this.qryData);
+                this.qryData.forEach((movie) => {
+                    if (movie.$key === key) {
+                        console.log(movie.description);
+                        this.descriptionToShow = movie.description;
+                        console.log(movie.release_date);
+                        this.descriptionToShow = movie.release_date;
+                        console.log(movie.showtimes);
+                        this.descriptionToShow = movie.showtimes;
+
+                    }
+                });
+            }*/
+        }
+
+        window.customElements.define(MovieList.is, MovieList);
     </script>
 </dom-module>
