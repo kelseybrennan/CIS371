@@ -19,20 +19,16 @@
         <div id="notLoggedIn">
             You must be logged in to view the tickets you have purchased.
         </div>
-        <div id="noTicketsPurchased">
-            You have not purchased any tickets.
-        </div>
         <div id="myTickets">
             <iron-list items="[[qryData]]" as="ticket">
                 <template>
                     <div>
                         <paper-card>
                             <div class="card-header">
-                                [[ticket.title]]
+                                [[ticket.title]] - Showing at [[ticket.showtime]]
                             </div>
                             <div class="card-content">
                                 [[ticket.numTickets]] ticket(s)
-                                [[tickets.showtime]]
                             </div>
                             <div class="card-actions">
                                 <paper-icon-button icon="close" on-click="returnTicket"></paper-icon-button>Cancel Ticket & Get Refund
@@ -72,10 +68,6 @@
                 padding: 8px;
             }
             #notLoggedIn {
-                font-family: 'Roboto', 'Noto', sans-serif;
-                padding: 10px;
-            }
-            #noTicketsPurchased {
                 font-family: 'Roboto', 'Noto', sans-serif;
                 padding: 10px;
             }
@@ -130,14 +122,8 @@
             _computePath(uid) {
                 if (uid) {
                     this.$.notLoggedIn.hidden = true;
-                    if (this.qryData.length > 0) {
-                        this.$.noTicketsPurchased.hidden = true;
-                    } else {
-                        this.$.noTicketsPurchased.hidden = false;
-                    }
                 } else {
                     this.$.notLoggedIn.hidden = false;
-                    this.$.noTicketsPurchased.hidden = true;
                 }
                 return `/users/${uid}`;
             }

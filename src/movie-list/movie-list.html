@@ -1,126 +1,23 @@
-<!--link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
-<link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-
-<dom-module id="movie-list">
-
-    <template>
-
-        <firebase-query path="/movies" data="{{qryData}}"></firebase-query>
-
-        <iron-list items="[[qryData]]" as="movie">
-            <template>
-                <div id="cardDiv" class="flex">
-                    <paper-card>
-                        <div class="card-header">
-                            [[movie.title]]
-                        </div>
-                        <div class="card-content">
-                            <img src="[[movie.image]]" height="25%" width="25%">
-                        </div>
-                        <div class="card-actions">
-                            <div class="layout horizontal end-justified">
-                                <div class="info">
-                                    <paper-icon-button icon="info-outline" on-click="viewDetail"></paper-icon-button>View info
-                                </div>
-                            </div>
-                        </div>
-                    </paper-card>
-
-                </div>
-            </template>
-        </iron-list>
-
-        <div>
-            [[descriptionToShow]]
-        </div>
-
-        <style include="iron-flex iron-flex-alignment"></style>
-
-        <style>
-            paper-card {
-                width: 100%;
-                height: 100%;
-            }
-            #cardDiv {
-                padding: 5px;
-            }
-            iron-list {
-                width: 95vw;
-                margin: auto;
-            }
-            .card-content {
-                font-family: 'Roboto', 'Noto', sans-serif;
-            }
-            .card-header {
-                font-family: 'Roboto', 'Noto', sans-serif;
-                font-size: 2em;
-                padding: 8px;
-            }
-            .info {
-                font-family: 'Roboto', 'Noto', sans-serif;
-            }
-        </style>
-
-    </template>
-
-    <script>
-        class MovieList extends Polymer.Element {
-            static get is() {
-                return 'movie-list';
-            }
-            static get properties() {
-                return {
-                    qryData: {
-                        type: Array
-                    },
-                    descriptionToShow: {
-                        type: String,
-                        value: null
-                    }
-                };
-            }
-
-            viewDetail(ev) {
-                var key = ev.model.movie.$key;
-                console.log(key);
-                console.log(this.qryData);
-                this.qryData.forEach((movie) => {
-                   if (movie.$key === key) {
-                       console.log(movie.description);
-                       this.descriptionToShow = movie.description;
-                   }
-                });
-
-            }
-
-
-        }
-
-        window.customElements.define(MovieList.is, MovieList);
-
-    </script>
-</dom-module-->
-
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../redux-mixin.html">
 
 <dom-module id="movie-list">
 
     <template>
 
         <firebase-query path="/movies" data="{{qryData}}"></firebase-query>
+        <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError"></firebase-auth>
 
         <iron-list items="[[qryData]]" as="movie">
             <template>
@@ -150,13 +47,11 @@
                                 </div>
                             </div>
                         </div>
-                        <!--div class="card-actions">
+                        <div class="card-actions">
                             <div class="layout horizontal end-justified">
-                                <div class="info">
-                                    <paper-icon-button icon="menu"></paper-icon-button>View info
-                                </div>
+                                <paper-icon-button icon="add-shopping-cart" on-click="buyTickets"></paper-icon-button>Buy tickets
                             </div>
-                        </div-->
+                        </div>
 
                     </paper-card>
 
@@ -164,9 +59,34 @@
             </template>
         </iron-list>
 
-        <!--div>
-            [[descriptionToShow]]
-        </div-->
+        <paper-dialog id="login" modal on-iron-overlay-closed="loginDiaClosed">
+            <div class="dialogText">
+                You must be logged in before purchasing tickets.
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>Login</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="buy" modal on-iron-overlay-closed="buyDiaClosed">
+            <div class="dialogText">
+                Buy Tickets
+                <paper-input id="numTickets" label="Number of tickets" type="number"></paper-input>
+                <paper-radio-group id="showTimePicker">
+                    <paper-radio-button name="10:30 AM">10:30 AM</paper-radio-button>
+                    <paper-radio-button name="12:15 PM">12:15 PM</paper-radio-button>
+                    <paper-radio-button name="3:00 PM">3:00 PM</paper-radio-button>
+                    <paper-radio-button name="5:45 PM">5:45 PM</paper-radio-button>
+                    <paper-radio-button name="7:30 PM">7:30 PM</paper-radio-button>
+                    <paper-radio-button name="9:00 PM">9:00 PM</paper-radio-button>
+                </paper-radio-group>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>Purchase</paper-button>
+            </div>
+        </paper-dialog>
 
         <style include="iron-flex iron-flex-alignment"></style>
 
@@ -190,12 +110,9 @@
                 font-size: 4em;
                 padding: 8px;
             }
-            .info {
+            .dialogText {
                 font-family: 'Roboto', 'Noto', sans-serif;
-                background-color: grey;
-                font-size: 2em;
             }
-
             .time {
                 font-family: 'Roboto', 'Noto', sans-serif;
                 padding: 4px;
@@ -206,8 +123,21 @@
 
     </template>
 
+    <script src="https://www.gstatic.com/firebasejs/4.7.0/firebase.js"></script>
     <script>
-        class MovieList extends Polymer.Element {
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyC_QssasYUo1XpRF7b6m6ieR5CfS9D85WY",
+            authDomain: "ticket-sales-41085.firebaseapp.com",
+            databaseURL: "https://ticket-sales-41085.firebaseio.com",
+            projectId: "ticket-sales-41085",
+            storageBucket: "ticket-sales-41085.appspot.com",
+            messagingSenderId: "767743966491"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script>
+        class MovieList extends ReduxMixin(Polymer.Element) {
             static get is() {
                 return 'movie-list';
             }
@@ -215,30 +145,62 @@
                 return {
                     qryData: {
                         type: Array
-                    }/*,
-                    descriptionToShow: {
+                    },
+                    uid: {
+                        type: String,
+                        value: null,
+                        statePath: 'uid'
+                    },
+                    movieId: {
                         type: String,
                         value: null
-                    }*/
+                    },
+                    title: {
+                        type: String,
+                        value: null
+                    }
                 };
             }
 
-            /*viewDetail(ev) {
-                var key = ev.model.movie.$key;
-                console.log(key);
-                console.log(this.qryData);
-                this.qryData.forEach((movie) => {
-                    if (movie.$key === key) {
-                        console.log(movie.description);
-                        this.descriptionToShow = movie.description;
-                        console.log(movie.release_date);
-                        this.descriptionToShow = movie.release_date;
-                        console.log(movie.showtimes);
-                        this.descriptionToShow = movie.showtimes;
+            buyTickets(ev) {
+                this.movieId = ev.model.movie.$key;
+                this.title = ev.model.movie.title;
 
-                    }
-                });
-            }*/
+                if (this.uid) {
+                    this.$.buy.open();
+                } else {
+                    this.$.login.open();
+                }
+
+            }
+
+            loginDiaClosed() {
+                if (this.$.login.closingReason.confirmed) {
+                    this.$.auth.signInWithPopup()
+                        .then((response) => {
+                            // After user is logged in, set the UID & email in the state
+                            var user = response.user;
+                            this.dispatch({type: 'SET_USER', payload: {uid: user.uid, email: user.email}});
+                            this.$.buy.open();
+                        })
+                        .catch((error) => console.log("Error logging in: " + error.message));
+                }
+            }
+
+            buyDiaClosed() {
+                if (this.$.buy.closingReason.confirmed) {
+                    // Get values from dialog
+                    var numTickets = this.$.numTickets.value;
+                    var time = this.$.showTimePicker.selectedItem.name;
+
+                    // Insert into Firebase
+                    var dbRef = firebase.database();
+                    dbRef.ref(`users/${this.uid}`).push().set({title: this.title, numTickets: numTickets, showtime: time, movieId: this.movieId});
+                    this.selectedTicketKey = null;
+                }
+            }
+
+
         }
 
         window.customElements.define(MovieList.is, MovieList);
