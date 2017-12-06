@@ -19,6 +19,9 @@
         <div id="notLoggedIn">
             You must be logged in to view the tickets you have purchased.
         </div>
+        <div id="noTicketsPurchased">
+            You have not purchased any tickets.
+        </div>
         <div id="myTickets">
             <iron-list items="[[qryData]]" as="ticket">
                 <template>
@@ -72,6 +75,10 @@
                 font-family: 'Roboto', 'Noto', sans-serif;
                 padding: 10px;
             }
+            #noTicketsPurchased {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                padding: 10px;
+            }
         </style>
 
     </template>
@@ -109,6 +116,9 @@
                     selectedTicketKey: {
                         type: String,
                         value: null
+                    },
+                    qryData: {
+                        type: Array
                     }
                 };
             }
@@ -120,8 +130,14 @@
             _computePath(uid) {
                 if (uid) {
                     this.$.notLoggedIn.hidden = true;
+                    if (this.qryData.length > 0) {
+                        this.$.noTicketsPurchased.hidden = true;
+                    } else {
+                        this.$.noTicketsPurchased.hidden = false;
+                    }
                 } else {
                     this.$.notLoggedIn.hidden = false;
+                    this.$.noTicketsPurchased.hidden = true;
                 }
                 return `/users/${uid}`;
             }
